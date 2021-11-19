@@ -33,7 +33,6 @@ subplot(2,1,2)
     xlim([0 0.05])
     xlabel('Frequency [Hz]'), ylabel('PSD [m$^2$/Hz]');box on; grid on;
     text(fpsd_pitch(peak_surge(1))+0.0005,max(psd_surge(:,1)),['$f_1=$' num2str(fpsd_pitch(peak_surge(1))) 'Hz'])
-    text(fpsd_pitch(peak_surge(2))+0.0005,max(psd_surge(:,1)),['$f_2=$' num2str(fpsd_pitch(peak_surge(2))) 'Hz'])
 figure(2)
 subplot(2,1,1)
     yyaxis left
@@ -53,5 +52,6 @@ subplot(2,1,2)
     xlim([0 0.05])
     xlabel('Frequency [Hz]'), ylabel('PSD [m$^2$/Hz]'); box on; grid on;
     text(fpsd_pitch(peak_pitch(1))+0.0005,max(psd_pitch(:,1)),['$f_1=$' num2str(fpsd_pitch(peak_pitch(1))) 'Hz'])
- 
+    text(fpsd_pitch(peak_pitch(2))+0.0005,max(psd_pitch(:,1)),['$f_2=$' num2str(fpsd_pitch(peak_pitch(2))) 'Hz'])
+
     
