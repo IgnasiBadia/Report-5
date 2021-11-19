@@ -14,8 +14,8 @@ pitchDot = q0(4);
 %[GF] = GFCalc(ti, indx)
 [GF] = zeros(2,1); %for Q8
 
-q_DotDot = inv(system.M + system.A).*(GF - system.C.*[x0; pitch] - ...
-    system.B.*[x0Dot; pitchDot]);
+q_DotDot = inv(system.M + system.A)*(GF - system.C*[x0; pitch] - ...
+    system.B*[x0Dot; pitchDot]);
 
 dqdt = [x0Dot; pitchDot; q_DotDot(1); q_DotDot(2)];
 

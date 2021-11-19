@@ -82,7 +82,6 @@ system.C(2,2)= data.KMoor*data.zMoor^2 - tau_boy;
 system.B = zeros(2,2);
 system.B(1,1) = 2e5;
 
-
 %% Part 2
 TDur = 600;
 deltaT = 0.1;
@@ -90,6 +89,15 @@ deltaf = 1/TDur;
 f = deltaf:deltaf:0.5;
 tspan= 0:deltaT:TDur - deltaT; %s
 
-q0 = [1 0 0 0];
-q = ode4(@dqdt, tspan, q0, system);
+%Question 10
+q0 = [1; 0; 0; 0];
+q_surge = ode4(@dqdt, tspan, q0, system);
+[psd_surge, fpsd_surge] = PSD(tspan, q_surge); 
+q0 = [0; 0.1; 0; 0];
+q_pitch = ode4(@dqdt, tspan, q0, system);
+[psd_pitch, fpsd_pitch] = PSD(tspan, q_pitch);
+
+%Question 11 - inlcude hydrodinamic forcing
+
+
 
