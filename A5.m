@@ -52,11 +52,23 @@ data.I_OTot = data.I_CMf + data.Mf*data.z_CMf^2 + data.I_CMTower +...
     data.MTower* data.z_CMTower^2 + (data.MNacelle+data.MRotor)*data.zHub^2;  
 
 % Question 6
-% Added mass
+% Mass matrix
+M = zeros(2,2);
+M(1,1) = data.MTot;
+M(1,2) = data.MTot*data.z_CMTot;
+M(2,1) = M(1,2);
+M(2,2) = data.I_OTot; 
 
+% Added mass Matrix
 A = zeros(2,2);
 A(1,1) = -data.rho*data.Cm*data.zBot*data.A;
 A(1,2) = -data.rho*data.Cm*data.zBot^2*data.A/2;
 A(2,1) = A(1,2);
 A(2,2) = -data.rho*data.Cm*data.zBot^3*data.A/3;
+
+% Stiffness Matrix
+K(1,1) = data.KMoor;
+K(1,2)= data.KMoor*data.zMoor;
+K(2,1) = K(1,2);
+K(2,2)= data.KMoor*data.zMoor^2;
 
