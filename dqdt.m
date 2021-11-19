@@ -1,4 +1,4 @@
-function dqdt = dqdt(ti, q0, tspan, system)
+function dqdt = dqdt(ti, q0, tspan)
 
 global system
 %q = [x0: pitch; x0Dot; pitchDot];
@@ -11,8 +11,7 @@ pitch = q0(2);
 pitchDot = q0(4);
 
 %indx = find(tspan ==  ti);
-%[GF] = GFCalc(ti, indx)
-[GF] = zeros(2,1); %for Q8
+[GF] = GFCalc(x0Dot, pitchDot) %zeros(2,1); %for Q8
 
 q_DotDot = inv(system.M + system.A)*(GF - system.C*[x0; pitch] - ...
     system.B*[x0Dot; pitchDot]);

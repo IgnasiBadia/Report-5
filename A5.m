@@ -18,7 +18,7 @@ set(0, 'DefaultFigureRenderer', 'painters');
 set(0,'DefaultFigureWindowStyle','docked') % docked
 
 %% Data definition
-global system
+global system wave
 
 % Masses: 
 data.Mf = 1.0897e7;  % [kg]
@@ -90,6 +90,17 @@ f = deltaf:deltaf:0.5;
 tspan= 0:deltaT:TDur - deltaT; %s
 
 %Question 10
+% q0 = [1; 0; 0; 0];
+% q_surge = ode4(@dqdt, tspan, q0, system);
+% [psd_surge, fpsd_surge] = PSD(tspan, q_surge); 
+% q0 = [0; 0.1; 0; 0];
+% q_pitch = ode4(@dqdt, tspan, q0, system);
+% [psd_pitch, fpsd_pitch] = PSD(tspan, q_pitch);
+
+%Question 11 - inlcude hydrodinamic forcing
+a = 240;
+wave.z = linspace(-data.zBot,a,0);
+wave.u = zeros(length(wave.z),1); 
 q0 = [1; 0; 0; 0];
 q_surge = ode4(@dqdt, tspan, q0, system);
 [psd_surge, fpsd_surge] = PSD(tspan, q_surge); 
@@ -97,7 +108,8 @@ q0 = [0; 0.1; 0; 0];
 q_pitch = ode4(@dqdt, tspan, q0, system);
 [psd_pitch, fpsd_pitch] = PSD(tspan, q_pitch);
 
-%Question 11 - inlcude hydrodinamic forcing
+%Waves
+
 
 
 
