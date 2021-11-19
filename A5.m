@@ -37,6 +37,7 @@ data.DSpar = 11.2; % m
 data.zBot = -120; % m
 data.h = 320; % m
 data.zMoor = -60; % m
+data.A = pi*data.DSpar^2/4; % m^2
 % Parameters:
 data.Cm = 1.0;
 data.CD = 0.6;
@@ -50,7 +51,12 @@ data.z_CMTot = (data.Mf*data.z_CMf + data.MTower*data.z_CMTower + ...
 data.I_OTot = data.I_CMf + data.Mf*data.z_CMf^2 + data.I_CMTower +...
     data.MTower* data.z_CMTower^2 + (data.MNacelle+data.MRotor)*data.zHub^2;  
 
-% Question 
+% Question 6
+% Added mass
 
-
+A = zeros(2,2);
+A(1,1) = -data.rho*data.Cm*data.zBot*data.A;
+A(1,2) = -data.rho*data.Cm*data.zBot^2*data.A/2;
+A(2,1) = A(1,2);
+A(2,2) = -data.rho*data.Cm*data.zBot^3*data.A/3;
 
