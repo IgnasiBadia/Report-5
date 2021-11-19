@@ -15,9 +15,11 @@ set(groot, 'defaultLegendInterpreter','latex');
 set(0,'defaultAxesFontSize',12);
 set(0, 'DefaultLineLineWidth', 1.1);
 set(0, 'DefaultFigureRenderer', 'painters');
-set(0,'DefaultFigureWindowStyle','normal') % docked
+set(0,'DefaultFigureWindowStyle','docked') % docked
 
 %% Data definition
+global system
+
 % Masses: 
 data.Mf = 1.0897e7;  % [kg]
 data.MTower = 5.4692e5; % kg
@@ -51,24 +53,43 @@ data.z_CMTot = (data.Mf*data.z_CMf + data.MTower*data.z_CMTower + ...
 data.I_OTot = data.I_CMf + data.Mf*data.z_CMf^2 + data.I_CMTower +...
     data.MTower* data.z_CMTower^2 + (data.MNacelle+data.MRotor)*data.zHub^2;  
 
+%Question 4 -- dalta demo report
+data.Ix = (pi*data.DSpar^4)/64;
+tau_boy = data.rho*data.g*data.Ix + data.MTot*data.g*(data.z_CMTot - data.zBot /2);
+
 % Question 6
 % Mass matrix
-M = zeros(2,2);
-M(1,1) = data.MTot;
-M(1,2) = data.MTot*data.z_CMTot;
-M(2,1) = M(1,2);
-M(2,2) = data.I_OTot; 
+system.M = zeros(2,2);
+system.M(1,1) = data.MTot;
+system.M(1,2) = data.MTot*data.z_CMTot;
+system.M(2,1) = system.M(1,2);
+system.M(2,2) = data.I_OTot; 
 
 % Added mass Matrix
-A = zeros(2,2);
-A(1,1) = -data.rho*data.Cm*data.zBot*data.A;
-A(1,2) = -data.rho*data.Cm*data.zBot^2*data.A/2;
-A(2,1) = A(1,2);
-A(2,2) = -data.rho*data.Cm*data.zBot^3*data.A/3;
+system.A = zeros(2,2);
+system.A(1,1) = -data.rho*data.Cm*data.zBot*data.A;
+system.A(1,2) = -data.rho*data.Cm*data.zBot^2*data.A/2;
+system.A(2,1) = system.A(1,2);
+system.A(2,2) = -data.rho*data.Cm*data.zBot^3*data.A/3;
 
 % Stiffness Matrix
-K(1,1) = data.KMoor;
-K(1,2)= data.KMoor*data.zMoor;
-K(2,1) = K(1,2);
-K(2,2)= data.KMoor*data.zMoor^2;
+system.C(1,1) = data.KMoor;
+system.C(1,2)= data.KMoor*data.zMoor;
+system.C(2,1) = system.C(1,2);
+system.C(2,2)= data.KMoor*data.zMoor^2 - tau_boy;
+
+% Stiffness Matrix
+system.B = zeros(2,2);
+system.B(1,1) = 2e5;
+
+
+%% Part 2
+TDur = 600;
+deltaT = 0.1;
+deltaf = 1/TDur;
+f = deltaf:deltaf:0.5;
+tspan= 0:deltaT:TDur - deltaT; %s
+
+q0 = [1 0 0 0];
+q = ode4(@dqdt, tspan, q0, system);
 
