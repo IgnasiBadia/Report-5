@@ -32,8 +32,10 @@ subplot(2,1,2)
     hold on; xline(fpsd_pitch(peak_surge(2)),'--k')
     xlim([0 0.05])
     xlabel('Frequency [Hz]'), ylabel('PSD [m$^2$/Hz]');box on; grid on;
-    text(fpsd_pitch(peak_surge(1))+0.0005,max(psd_surge(:,1)),['$f_1=$' num2str(fpsd_pitch(peak_surge(1))) 'Hz'])
-figure(2)
+    text(fpsd_pitch(peak_surge(1))+0.0005,max(psd_surge(:,1))*0.9,['$f_1=$' num2str(fpsd_pitch(peak_surge(1))) 'Hz'])
+    text(fpsd_pitch(peak_surge(2))+0.0005,max(psd_surge(:,1))*0.9,['$f_1=$' num2str(fpsd_pitch(peak_surge(2))) 'Hz'])
+printfig(18,12,'Q10 - Surge decay test',0)
+    figure(2)
 subplot(2,1,1)
     yyaxis left
     plot(tspan,q_pitch(:,1),'k')
@@ -51,7 +53,7 @@ subplot(2,1,2)
     hold on; xline(fpsd_pitch(peak_pitch(2)),'--k')
     xlim([0 0.05])
     xlabel('Frequency [Hz]'), ylabel('PSD [m$^2$/Hz]'); box on; grid on;
-    text(fpsd_pitch(peak_pitch(1))+0.0005,max(psd_pitch(:,1)),['$f_1=$' num2str(fpsd_pitch(peak_pitch(1))) 'Hz'])
-    text(fpsd_pitch(peak_pitch(2))+0.0005,max(psd_pitch(:,1)),['$f_2=$' num2str(fpsd_pitch(peak_pitch(2))) 'Hz'])
-
+    text(fpsd_pitch(peak_pitch(1))+0.0005,max(psd_pitch(:,1))*0.9,['$f_1=$' num2str(fpsd_pitch(peak_pitch(1))) 'Hz'])
+    text(fpsd_pitch(peak_pitch(2))+0.0005,max(psd_pitch(:,1))*0.9,['$f_2=$' num2str(fpsd_pitch(peak_pitch(2))) 'Hz'])
+printfig(18,12,'Q10 - Pitch decay test',0)
     
