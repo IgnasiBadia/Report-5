@@ -1,6 +1,5 @@
-function dqdt = dqdt(ti, q0, tspan)
-
-global system data
+function dqdt = dqdt(ti, q0)
+global system mode
 %q = [x0: pitch; x0Dot; pitchDot];
 %dqdt = [x0Dot; pitchDot; x0DotDot; pitchDotDot];
 
@@ -10,11 +9,10 @@ x0Dot = q0(3);
 pitch = q0(2);
 pitchDot = q0(4);
 
-%indx = find(tspan ==  ti);
-if data.decaytest==1
+if mode.decaytest==1
     GF = zeros(2,1); %for Q8 Decay test
 else
-    [GF] = GFCalc(x0Dot, pitchDot);
+    [GF] = GFCalc(x0Dot, pitchDot, ti);
 end
 
 q_DotDot = inv(system.M + system.A)*(GF - system.C*[x0; pitch] - ...
