@@ -82,6 +82,11 @@ system.C(2,2)= data.KMoor*data.zMoor^2 - tau_boy;
 system.B = zeros(2,2);
 system.B(1,1) = 2e5;
 
+% Question 7 - Eigen value problem
+[eigenvector, eigenvalue]=eig(system.C,system.A+system.M);
+freq = sqrt(diag(eigenvalue))/(2*pi);
+
+
 %% Part 2
 TDur = 600;
 deltaT = 0.1;
