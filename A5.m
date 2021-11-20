@@ -103,10 +103,10 @@ freq = sqrt(diag(eigenvalue))/(2*pi);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Part 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-TDur = 1000;
+TDur = 1200;
 deltaf = 1/TDur;
 f = deltaf:deltaf:0.5;
-deltaT = 0.05;
+deltaT = 0.1;
 tspan= 0:deltaT:TDur - deltaT; %s
 
 %% Question 10 - Decay test 
@@ -122,26 +122,28 @@ save('Q10.mat','q_pitch','q_surge','psd_pitch','fpsd_pitch','psd_surge',...
 
 %% Question 11 - inlcude hydrodinamic forcing
 %Q11-a
-mode.decaytest = 0; %GF calculation
-a = -data.zBot + 1; % Number of sections of draft
-wave.z = linspace(data.zBot,0,a);
-wave.U = zeros(length(wave.z), length(tspan)); 
-q0 = [1; 0; 0; 0];
-q_surge = ode4(@dqdt, tspan, q0);
-[psd_surge, fpsd_surge] = PSD(tspan,q_surge(:,1:2)); 
-q0 = [0; 0.1; 0; 0];
-q_pitch = ode4(@dqdt, tspan, q0);
-[psd_pitch, fpsd_pitch] = PSD(tspan, q_pitch(:,1:2));
-
-%Q11-b
-mode.decaytest = 1; %Fhyrdo disabled
-q0 = [0; 1; 0; 0];
-q_pitch_2 = ode4(@dqdt, tspan, q0);
-[psd_pitch, fpsd_pitch] = PSD(tspan, q_pitch_2(:,1:2));
-
-save('Q11a.mat','q_pitch_2', 'q_pitch','q_surge','psd_pitch','fpsd_pitch','psd_surge',...
-    'fpsd_surge','tspan')
-
+% mode.decaytest = 0; %GF calculation
+% a = -data.zBot + 1; % Number of sections of draft
+% wave.z = linspace(data.zBot,0,a);
+% wave.U = zeros(length(wave.z), length(tspan)); 
+% q0 = [1; 0; 0; 0];
+% q_surge = ode4(@dqdt, tspan, q0);
+% [psd_surge, fpsd_surge] = PSD(tspan,q_surge(:,1:2)); 
+% q0 = [0; 0.1; 0; 0];
+% q_pitch = ode4(@dqdt, tspan, q0);
+% [psd_pitch, fpsd_pitch] = PSD(tspan, q_pitch(:,1:2));
+% save('Q11.mat', 'q_pitch','q_surge','psd_pitch','fpsd_pitch','psd_surge',...
+%     'fpsd_surge','tspan')
+% 
+% %Q11-b
+% mode.decaytest = 1; %Fhyrdo disabled
+% q0 = [0; 1; 0; 0];
+% q_pitch_2 = ode4(@dqdt, tspan, q0);
+% [psd_pitch, fpsd_pitch] = PSD(tspan, q_pitch_2(:,1:2));
+% 
+% save('Q11a.mat','q_pitch_2', 'q_pitch','q_surge','psd_pitch','fpsd_pitch','psd_surge',...
+%     'fpsd_surge','tspan')
+% 
 %% Wave climate data
 deltaT_climates = 0.05;
 tspan_climates= 0:deltaT_climates:TDur - deltaT_climates; %s
@@ -158,11 +160,14 @@ wind.l = 340.2; %m
 mode.decaytest = 0; %GF calculation
 mode.Wind = 0;
 [wave.eta, wave.U] = RegularWaveTimeSeries(tspan_climates, data);
-
+eta = wave.eta;
 q0 = [0; 0; 0; 0];
 q = ode4(@dqdt, tspan, q0);
-[psd_surge, fpsd_surge] = PSD(tspan, q); 
+[psd, fpsd] = PSD(tspan(6000:end), q(6000:end,1:2)); 
+[psd_eta, fpsd_eta] = PSD(tspan_climates(12000:end), wave.eta(12000:end)); 
 
+
+save('Q12.mat','psd','fpsd','q','tspan','tspan_climates','psd_eta','fpsd_eta','eta')
 %% Question 13 - Regular Waves and steady wind
 mode.decaytest = 0; %GF calculation
 mode.Wind = 1;
@@ -172,7 +177,7 @@ wind.V_t = ones(1,length(tspan_climates))*wind.V10;
 
 q0 = [0; 0; 0; 0];
 q = ode4(@dqdt, tspan, q0);
-[psd_surge, fpsd_surge] = PSD(tspan, q); 
+[psd, fpsd] = PSD(tspan, q); 
 
 %% Question 14 - Irregular waves and steady wind
 mode.decaytest = 0; %GF calculation
@@ -182,7 +187,7 @@ mode.Wind = 1;
 
 q0 = [0; 0; 0; 0];
 q = ode4(@dqdt, tspan, q0);
-[psd_surge, fpsd_surge] = PSD(tspan, q); 
+[psd, fpsd] = PSD(tspan, q); 
 
 %% Question 15 - Irregular waves and Unsteady wind (windties
 mode.Wind = 1;
@@ -192,7 +197,7 @@ mode.decaytest = 0; %GF calculation
 
 q0 = [0; 0; 0; 0];
 q = ode4(@dqdt, tspan, q0);
-[psd_surge, fpsd_surge] = PSD(tspan, q); 
+[psd, fpsd] = PSD(tspan, q); 
 
 
 

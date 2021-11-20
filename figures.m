@@ -153,4 +153,47 @@ for i=1
 %     grid on;box on; 
 %     printfig(23,12,'Q11 - Pitch decay test comparison',1)
 end    
-%% Question ...
+%% Question 12
+for i=1
+load('Q12.mat')
+[maxi,loc]=max(psd_eta); % Surface elevation
+[maxi2,loc2]=max(psd(:,1)); % Surge 
+[maxi3,loc3]=max(psd(:,2)); % Pitch
+figure()
+subplot(3,2,1)
+    plot(tspan_climates,eta,'b'); hold on;
+    plot(tspan_climates(1:(end/2)),eta(1:(end/2)),'c'); ylim([min(eta)*1.1 max(eta)*1.1]);
+    xlabel('t [s]'); ylabel('$\eta$ [m]'); grid on; box on;
+    title('Time series')
+subplot(3,2,2)
+    plot(fpsd_eta,psd_eta,'b'); 
+    hold on; xline(0.00833,'--k'); hold on;xline(0.03167,'--r'); 
+    text(fpsd_eta(loc)*1.1,maxi,[num2str(fpsd(loc)) ' Hz'])
+    xlim([0 0.2])
+    xlabel('Frequency [Hz]'); ylabel('$PSD$ [m$^2$/Hz]'); grid on; box on; 
+    title('PSDs')
+subplot(3,2,3)
+    plot(tspan,q(:,1),'b'); hold on;
+    plot(tspan(1:(end/2)),q(1:(end/2),1),'c'); 
+    xlabel('t [s]'); ylabel('Surge $x_0$ [m]'); grid on; box on;
+subplot(3,2,4)
+    plot(fpsd,psd(:,1),'b'); 
+    hold on; xline(0.00833,'--k'); hold on;xline(0.03167,'--r'); 
+    text(fpsd(loc2)*1.1,maxi2,[num2str(fpsd(loc2)) ' Hz'])    
+    xlim([0 0.2]);ylim([0 max(psd(:,1))*1.2])
+    xlabel('Frequency [Hz]'); ylabel('$PSD$ [m$^2$/Hz]'); grid on; box on;
+subplot(3,2,5)
+    plot(tspan,q(:,2),'b'); hold on;
+    plot(tspan(1:(end/2)),q(1:(end/2),2),'c'); 
+    xlabel('t [s]'); ylabel('Pitch $\theta$ [rad]'); grid on; box on;
+subplot(3,2,6)
+    plot(fpsd,psd(:,2),'b'); 
+    hold on; xline(0.00833,'--k'); hold on;xline(0.03167,'--r'); hold on;
+    text(fpsd(loc3)*1.1,maxi3,[num2str(fpsd(loc3)) ' Hz'])    
+    xlim([0 0.2]); ylim([0 max(psd(:,2))*1.2])
+    xlabel('Frequency [Hz]'); ylabel('$PSD$ [rad$^2$/Hz]'); grid on; box on; 
+printfig(20,15,'Q12 - Eta, surge and pitch responses',1)
+end    
+        
+    
+    
