@@ -117,33 +117,9 @@ q_surge = ode4(@dqdt, tspan, q0);
 q0 = [0; 0.1; 0; 0];
 q_pitch = ode4(@dqdt, tspan, q0);
 [psd_pitch, fpsd_pitch] = PSD(tspan, q_pitch(:,1:2));
-save('Q10.mat','q_pitch','q_surge','psd_pitch','fpsd_pitch','psd_surge',...
+save('results/Q10.mat','q_pitch','q_surge','psd_pitch','fpsd_pitch','psd_surge',...
     'fpsd_surge','tspan')
 
-%% Question 11 - inlcude hydrodinamic forcing
-%Q11-a
-% mode.decaytest = 0; %GF calculation
-% a = -data.zBot + 1; % Number of sections of draft
-% wave.z = linspace(data.zBot,0,a);
-% wave.U = zeros(length(wave.z), length(tspan)); 
-% q0 = [1; 0; 0; 0];
-% q_surge = ode4(@dqdt, tspan, q0);
-% [psd_surge, fpsd_surge] = PSD(tspan,q_surge(:,1:2)); 
-% q0 = [0; 0.1; 0; 0];
-% q_pitch = ode4(@dqdt, tspan, q0);
-% [psd_pitch, fpsd_pitch] = PSD(tspan, q_pitch(:,1:2));
-% save('Q11.mat', 'q_pitch','q_surge','psd_pitch','fpsd_pitch','psd_surge',...
-%     'fpsd_surge','tspan')
-% 
-% %Q11-b
-% mode.decaytest = 1; %Fhyrdo disabled
-% q0 = [0; 1; 0; 0];
-% q_pitch_2 = ode4(@dqdt, tspan, q0);
-% [psd_pitch, fpsd_pitch] = PSD(tspan, q_pitch_2(:,1:2));
-% 
-% save('Q11a.mat','q_pitch_2', 'q_pitch','q_surge','psd_pitch','fpsd_pitch','psd_surge',...
-%     'fpsd_surge','tspan')
-% 
 %% Wave climate data
 deltaT_climates = 0.05;
 tspan_climates= 0:deltaT_climates:TDur - deltaT_climates; %s
@@ -156,71 +132,78 @@ wind.V10 = 8; %mean steady wind at hub
 wind.I = 0.14; %turbulence intensity
 wind.l = 340.2; %m
 
-%% Question 12 - regular waves and no wind
+%% Question 11 - inlcude hydrodinamic forcing
+%Q11-a
+mode.decaytest = 0; %GF calculation
+mode.Wind = 0;
+a = -data.zBot + 1; % Number of sections of draft
+wave.z = linspace(data.zBot,0,a);
+wave.U = zeros(length(wave.z), length(tspan_climates)); 
+wave.dUdt = zeros(length(wave.z), length(tspan_climates));
+q0 = [1; 0; 0; 0];
+q_surge = ode4(@dqdt, tspan, q0);
+[psd_surge, fpsd_surge] = PSD(tspan,q_surge(:,1:2)); 
+q0 = [0; 0.1; 0; 0];
+q_pitch = ode4(@dqdt, tspan, q0);
+[psd_pitch, fpsd_pitch] = PSD(tspan, q_pitch(:,1:2));
+save('results/Q11a.mat', 'q_pitch','q_surge','psd_pitch','fpsd_pitch','psd_surge',...
+    'fpsd_surge','tspan')
+
+%Q11-b
+mode.decaytest = 1; %Fhyrdo disabled
+q0 = [0; 1; 0; 0];
+q_pitch_2 = ode4(@dqdt, tspan, q0);
+[psd_pitch, fpsd_pitch] = PSD(tspan, q_pitch_2(:,1:2));
+save('results/Q11b.mat','q_pitch_2', 'q_pitch','q_surge','psd_pitch','fpsd_pitch','psd_surge',...
+    'fpsd_surge','tspan')
+
+%% Question 12 - Regular waves and no wind
 mode.decaytest = 0; %GF calculation if 0
 mode.Wind = 0;
-[wave.eta, wave.U,wave.a] = RegularWaveTimeSeries(tspan_climates, data);
+[wave.eta, wave.U,wave.dUdt] = RegularWaveTimeSeries(tspan_climates, data);
 eta = wave.eta;
+
 q0 = [0; 0; 0; 0];
 q = ode4(@dqdt, tspan, q0);
 [psd, fpsd] = PSD(tspan(6000:end), q(6000:end,1:2)); 
 [psd_eta, fpsd_eta] = PSD(tspan_climates(12000:end), wave.eta(12000:end)); 
-
-save('Q12.mat','psd','fpsd','q','tspan','tspan_climates','psd_eta','fpsd_eta','eta')
+save('results/Q12.mat','psd','fpsd','q','tspan','tspan_climates','psd_eta','fpsd_eta','eta')
 %% Question 13 - Regular Waves and steady wind
 mode.decaytest = 0; %GF calculation
-mode.Wind = 1; % Steady wind
+mode.Wind = 1; % Wind force calc
 %Steady wind
 wind.V_t = ones(1,length(tspan_climates))*wind.V10;
-[wave.eta, wave.U,wave.a] = RegularWaveTimeSeries(tspan_climates, data);
+vt = wind.V_t;
 
 q0 = [0; 0; 0; 0];
 q = ode4(@dqdt, tspan, q0);
-[psd, fpsd] = PSD(tspan, q); 
-
+[psd, fpsd] = PSD(tspan(6000:end), q(6000:end,1:2));
+[psd_vt, fpsd_vt] = PSD(tspan_climates(12000:end), wind.V_t(12000:end)); 
+save('results/Q13.mat','psd','fpsd','q','tspan','tspan_climates','psd_vt','fpsd_vt','vt')
 %% Question 14 - Irregular waves and steady wind
 mode.decaytest = 0; %GF calculation
-mode.Wind = 1; % Steady wind
+mode.Wind = 1; % Wind force calc
 %wave time series
 [wave.A, wave.eta, wave.U, wave.dUdt] = waveTimeSeries(f, tspan_climates, data);
+wta = wave.eta;
 
 q0 = [0; 0; 0; 0];
 q = ode4(@dqdt, tspan, q0);
-[psd, fpsd] = PSD(tspan, q); 
-
-%% Question 15 - Irregular waves and Unsteady wind (windties
-mode.Wind = 2; %Unsteady wind
+[psd, fpsd] = PSD(tspan(6000:end), q(6000:end,1:2));
+[psd_eta, fpsd_eta] = PSD(tspan_climates(12000:end), wave.eta(12000:end)); 
+save('results/Q14.mat','psd','fpsd','q','tspan','tspan_climates','psd_eta','fpsd_eta','eta')
+%% Question 15 - Irregular waves and unsteady wind (turbulence)
+mode.Wind = 1; % Wind force calc
 mode.decaytest = 0; %GF calculation
 %Wind time series
 [wind.V_t,wind.V_sum] = windTimeSeries(f, tspan_climates);
+vt = wind.V_t;
 
 q0 = [0; 0; 0; 0];
 q = ode4(@dqdt, tspan, q0);
-[psd, fpsd] = PSD(tspan, q); 
- 
-figure
-plot(tspan,wind.F);
-hold on;
-plot(tspan,wave.F); 
-figure
-plot(tspan,mode.GF(1,:));  
-figure
-plot(tspan,q(:,1));
-
-
-figure
-plot(tspan,wave.F);
-
-[psd, fpsd] = PSD(tspan(6000:end), q(6000:end,1));
-[psdv, fpsdv] = PSD(tspan_climates(12000:end), wave.U(1,12000:end));
-[psda, fpsda] = PSD(tspan_climates(12000:end), wave.a(1,12000:end));
-
-figure
-plot(fpsd,psd);hold on;
-% plot(fpsdv,psdv,'r');hold on;
-% plot(fpsda,psda,'k');hold on;
-xlim([0 0.5])
-
+[psd, fpsd] = PSD(tspan(6000:end), q(6000:end,1:2));
+[psd_vt, fpsd_vt] = PSD(tspan_climates(12000:end), wind.V_t(12000:end)); 
+save('results/Q15.mat','psd','fpsd','q','tspan','tspan_climates','psd_vt','fpsd_vt','vt')
 
 
 

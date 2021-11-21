@@ -1,6 +1,6 @@
 function [eta, u, a] = RegularWaveTimeSeries(t, data)
 global wave
-x =0; % data.DSpar/2; % ?
+x = data.DSpar/2; % ?
 T = wave.Tp;
 H = wave.Hs;
 h = data.h;

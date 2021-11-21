@@ -19,6 +19,7 @@ function Y = ode4(odefun,tspan,y0,varargin)
 %         plot(tspan,y(:,1));
 %     solves the system y' = vdp1(t,y) with a constant step size of 0.1, 
 %     and plots the first component of the solution.   
+%
 
 if ~isnumeric(tspan)
   error('TSPAN should be a vector of integration steps.');
@@ -59,7 +60,6 @@ for i = 2:N
   F(:,2) = feval(odefun,ti+0.5*hi,yi+0.5*hi*F(:,1),varargin{:});
   F(:,3) = feval(odefun,ti+0.5*hi,yi+0.5*hi*F(:,2),varargin{:});  
   F(:,4) = feval(odefun,tspan(i),yi+hi*F(:,3),varargin{:});
-  F(:,1) = feval(odefun,ti,yi,varargin{:});
   Y(:,i) = yi + (hi/6)*(F(:,1) + 2*F(:,2) + 2*F(:,3) + F(:,4));
 end
 Y = Y.';
