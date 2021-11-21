@@ -192,7 +192,7 @@ subplot(3,2,6)
     text(fpsd(loc3)*1.1,maxi3,[num2str(fpsd(loc3)) ' Hz'])    
     xlim([0 0.2]); ylim([0 max(psd(:,2))*1.2])
     xlabel('Frequency [Hz]'); ylabel('$PSD$ [rad$^2$/Hz]'); grid on; box on; 
-printfig(20,15,'Q12 - Eta, surge and pitch responses',1)
+printfig(20,15,'Q12 - Eta, surge and pitch responses',0)
 end    
         
     

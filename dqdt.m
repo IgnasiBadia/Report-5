@@ -1,17 +1,17 @@
-function dqdt = dqdt(ti, q0)
+function dqdt = dqdt(ti, q)
 global system mode
 %q = [x0: pitch; x0Dot; pitchDot];
 %dqdt = [x0Dot; pitchDot; x0DotDot; pitchDotDot];
 
 dqdt = zeros(4,1); %column vector
-x0 = q0(1);
-x0Dot = q0(3);
-pitch = q0(2);
-pitchDot = q0(4);
+x0 = q(1);
+x0Dot = q(3);
+pitch = q(2);
+pitchDot = q(4);
 
 if mode.decaytest==1
     GF = zeros(2,1); %for Q8 Decay test
-else
+elseif mode.decaytest == 0
     [GF] = GFCalc(x0Dot, pitchDot, ti);
 end
 

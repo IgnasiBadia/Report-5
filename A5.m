@@ -18,7 +18,7 @@ set(0, 'DefaultFigureRenderer', 'painters');
 set(0,'DefaultFigureWindowStyle','docked') % docked
 
 %% Data definition
-global system wave data wind tspan mode
+global system wave data wind tspan mode tspan_climates
 
 % Masses: 
 data.Mf = 1.0897e7;  % [kg]
@@ -157,23 +157,22 @@ wind.I = 0.14; %turbulence intensity
 wind.l = 340.2; %m
 
 %% Question 12 - regular waves and no wind
-mode.decaytest = 0; %GF calculation
+mode.decaytest = 0; %GF calculation if 0
 mode.Wind = 0;
-[wave.eta, wave.U] = RegularWaveTimeSeries(tspan_climates, data);
+[wave.eta, wave.U,wave.a] = RegularWaveTimeSeries(tspan_climates, data);
 eta = wave.eta;
 q0 = [0; 0; 0; 0];
 q = ode4(@dqdt, tspan, q0);
 [psd, fpsd] = PSD(tspan(6000:end), q(6000:end,1:2)); 
 [psd_eta, fpsd_eta] = PSD(tspan_climates(12000:end), wave.eta(12000:end)); 
 
-
 save('Q12.mat','psd','fpsd','q','tspan','tspan_climates','psd_eta','fpsd_eta','eta')
 %% Question 13 - Regular Waves and steady wind
 mode.decaytest = 0; %GF calculation
-mode.Wind = 1;
+mode.Wind = 1; % Steady wind
 %Steady wind
 wind.V_t = ones(1,length(tspan_climates))*wind.V10;
-
+[wave.eta, wave.U,wave.a] = RegularWaveTimeSeries(tspan_climates, data);
 
 q0 = [0; 0; 0; 0];
 q = ode4(@dqdt, tspan, q0);
@@ -181,7 +180,7 @@ q = ode4(@dqdt, tspan, q0);
 
 %% Question 14 - Irregular waves and steady wind
 mode.decaytest = 0; %GF calculation
-mode.Wind = 1;
+mode.Wind = 1; % Steady wind
 %wave time series
 [wave.A, wave.eta, wave.U, wave.dUdt] = waveTimeSeries(f, tspan_climates, data);
 
@@ -190,7 +189,7 @@ q = ode4(@dqdt, tspan, q0);
 [psd, fpsd] = PSD(tspan, q); 
 
 %% Question 15 - Irregular waves and Unsteady wind (windties
-mode.Wind = 1;
+mode.Wind = 2; %Unsteady wind
 mode.decaytest = 0; %GF calculation
 %Wind time series
 [wind.V_t,wind.V_sum] = windTimeSeries(f, tspan_climates);
@@ -198,9 +197,29 @@ mode.decaytest = 0; %GF calculation
 q0 = [0; 0; 0; 0];
 q = ode4(@dqdt, tspan, q0);
 [psd, fpsd] = PSD(tspan, q); 
+ 
+figure
+plot(tspan,wind.F);
+hold on;
+plot(tspan,wave.F); 
+figure
+plot(tspan,mode.GF(1,:));  
+figure
+plot(tspan,q(:,1));
 
 
+figure
+plot(tspan,wave.F);
 
+[psd, fpsd] = PSD(tspan(6000:end), q(6000:end,1));
+[psdv, fpsdv] = PSD(tspan_climates(12000:end), wave.U(1,12000:end));
+[psda, fpsda] = PSD(tspan_climates(12000:end), wave.a(1,12000:end));
+
+figure
+plot(fpsd,psd);hold on;
+% plot(fpsdv,psdv,'r');hold on;
+% plot(fpsda,psda,'k');hold on;
+xlim([0 0.5])
 
 
 
