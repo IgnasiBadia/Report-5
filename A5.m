@@ -186,7 +186,7 @@ mode.decaytest = 0; %GF calculation
 mode.Wind = 1; % Wind force calc
 %wave time series
 [wave.A, wave.eta, wave.U, wave.dUdt] = waveTimeSeries(f, tspan_climates, data);
-wta = wave.eta;
+eta = wave.eta;
 
 q0 = [0; 0; 0; 0];
 q = ode4(@dqdt, tspan, q0);
@@ -199,12 +199,16 @@ mode.decaytest = 0; %GF calculation
 %Wind time series
 [wind.V_t,wind.V_sum] = windTimeSeries(f, tspan_climates);
 vt = wind.V_t;
+% Wave time series
+[wave.A, wave.eta, wave.U, wave.dUdt] = waveTimeSeries(f, tspan_climates, data);
+
 
 q0 = [0; 0; 0; 0];
 q = ode4(@dqdt, tspan, q0);
 [psd, fpsd] = PSD(tspan(6000:end), q(6000:end,1:2));
+[psd_eta, fpsd_eta] = PSD(tspan_climates(12000:end), wave.eta(12000:end)); 
 [psd_vt, fpsd_vt] = PSD(tspan_climates(12000:end), wind.V_t(12000:end)); 
-save('results/Q15.mat','psd','fpsd','q','tspan','tspan_climates','psd_vt','fpsd_vt','vt')
+save('results/Q15.mat','psd','eta','psd_eta','fpsd_eta','fpsd','q','tspan','tspan_climates','psd_vt','fpsd_vt','vt')
 
 
 
