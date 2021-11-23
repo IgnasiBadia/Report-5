@@ -179,7 +179,8 @@ q0 = [0; 0; 0; 0];
 q = ode4(@dqdt, tspan, q0);
 [psd, fpsd] = PSD(tspan(6000:end), q(6000:end,1:2));
 [psd_vt, fpsd_vt] = PSD(tspan_climates(12000:end), wind.V_t(12000:end)); 
-save('results/Q13.mat','psd','fpsd','q','tspan','tspan_climates','psd_vt','fpsd_vt','vt')
+[psd_eta, fpsd_eta] = PSD(tspan_climates(12000:end), wave.eta(12000:end)); 
+save('results/Q13.mat','psd','fpsd','q','tspan','tspan_climates','psd_eta','psd_vt','eta','fpsd_vt','fpsd_eta','vt')
 %% Question 14 - Irregular waves and steady wind
 mode.decaytest = 0; %GF calculation
 mode.Wind = 1; % Wind force calc
