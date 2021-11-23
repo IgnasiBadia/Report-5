@@ -18,7 +18,7 @@ set(0, 'DefaultFigureRenderer', 'painters');
 set(0,'DefaultFigureWindowStyle','docked') % docked
 
 %% Data definition
-global system wave data wind tspan mode tspan_climates
+global system wave data wind tspan mode tspan_climates controller
 
 % Masses: 
 data.Mf = 1.0897e7;  % [kg]
@@ -108,6 +108,7 @@ deltaf = 1/TDur;
 f = deltaf:deltaf:0.5;
 deltaT = 0.1;
 tspan= 0:deltaT:TDur - deltaT; %s
+mode.controller = 0;
 
 %% Question 10 - Decay test 
 mode.decaytest = 1; % 1 if GF is for decay test 0
@@ -159,6 +160,7 @@ save('results/Q11b.mat','q_pitch_2', 'q_pitch','q_surge','psd_pitch','fpsd_pitch
 
 %% Question 12 - Regular waves and no wind
 mode.decaytest = 0; %GF calculation if 0
+mode.controller = 0;
 mode.Wind = 0;
 [wave.eta, wave.U,wave.dUdt] = RegularWaveTimeSeries(tspan_climates, data);
 eta = wave.eta;
@@ -171,7 +173,9 @@ save('results/Q12.mat','psd','fpsd','q','tspan','tspan_climates','psd_eta','fpsd
 %% Question 13 - Regular Waves and steady wind
 mode.decaytest = 0; %GF calculation
 mode.Wind = 1; % Wind force calc
+mode.controller = 0;
 %Steady wind
+wind.V10 = 8; %mean steady wind at hub
 wind.V_t = ones(1,length(tspan_climates))*wind.V10;
 vt = wind.V_t;
 
@@ -184,6 +188,7 @@ save('results/Q13.mat','psd','fpsd','q','tspan','tspan_climates','psd_eta','psd_
 %% Question 14 - Irregular waves and steady wind
 mode.decaytest = 0; %GF calculation
 mode.Wind = 1; % Wind force calc
+mode.controller = 0;
 %wave time series
 [wave.A, wave.eta, wave.U, wave.dUdt] = waveTimeSeries(f, tspan_climates, data);
 eta = wave.eta;
@@ -196,12 +201,12 @@ save('results/Q14.mat','psd','fpsd','q','tspan','tspan_climates','psd_eta','fpsd
 %% Question 15 - Irregular waves and unsteady wind (turbulence)
 mode.Wind = 1; % Wind force calc
 mode.decaytest = 0; %GF calculation
+mode.controller = 0;
 %Wind time series
 [wind.V_t,wind.V_sum] = windTimeSeries(f, tspan_climates);
 vt = wind.V_t;
 % Wave time series
 [wave.A, wave.eta, wave.U, wave.dUdt] = waveTimeSeries(f, tspan_climates, data);
-
 
 q0 = [0; 0; 0; 0];
 q = ode4(@dqdt, tspan, q0);
@@ -210,7 +215,56 @@ q = ode4(@dqdt, tspan, q0);
 [psd_vt, fpsd_vt] = PSD(tspan_climates(12000:end), wind.V_t(12000:end)); 
 save('results/Q15.mat','psd','eta','psd_eta','fpsd_eta','fpsd','q','tspan','tspan_climates','psd_vt','fpsd_vt','vt')
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%PITCH CONTROL FOR DYNAMIC STABILITY%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%% Question 16 - no waves and steady wind 
+V10 = [10, 16]; %mean steady wind at hub
+mode.wind = 1; 
+mode.controller = 0;
+wave.U = zeros(length(wave.z), length(tspan_climates)); 
+wave.dUdt = zeros(length(wave.z), length(tspan_climates));
 
+q0 = [0; 0; 0; 0];
+q = zeros(length(V10), length(tspan), 4);
+for vi = 1:length(V10)
+    wind.V10 = V10(vi); 
+    wind.V_t = ones(1,length(tspan_climates))*wind.V10; 
+    vt(vi,:) = wind.V_t;
+    q(vi,:,:) = ode4(@dqdt, tspan, q0);
+end
+[psd, fpsd] = PSD(tspan(6000:end), q(:,6000:end,1:2));
+save('results/Q16.mat','psd','fpsd','q','tspan','tspan_climates', 'vt')
+
+%% Question 17 
+controller.gamma = 2;
+mode.controller = 1;
+mode.wind = 1; 
+
+q0 = [0; 0; 0; 0; 0];
+wind.V10 = V10(2); 
+wind.V_t = ones(1,length(tspan_climates))*wind.V10; 
+vt = wind.V_t;
+q = ode4(@dqdt, tspan, q0);
+[psd, fpsd] = PSD(tspan(6000:end), q(6000:end,1:2));
+save('results/Q17.mat','psd','fpsd','q','tspan','tspan_climates','vt')
+
+%% Question 18
+controller.gamma = 0.4;
+gamma = controller.gamma;
+mode.controller = 1;
+V10 = [10, 16]; %mean steady wind at hub
+mode.wind = 1; 
+wave.U = zeros(length(wave.z), length(tspan_climates)); 
+wave.dUdt = zeros(length(wave.z), length(tspan_climates));
+
+q0 = [0; 0; 0; 0; 0];
+wind.V10 = V10(2); 
+wind.V_t = ones(1,length(tspan_climates))*wind.V10; 
+vt = wind.V_t;
+q = ode4(@dqdt, tspan, q0);
+[psd, fpsd] = PSD(tspan(6000:end), q(6000:end,1:2));
+save('results/Q18.mat','psd','fpsd','q','tspan','tspan_climates','vt', 'gamma')
 
 
